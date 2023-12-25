@@ -1,10 +1,3 @@
-# from pytube import YouTube
-# link = input("Enter Url of Video")
-# video = YouTube(link)
-# stream = video.streams.get_highest_resolution()
-# stream.download()
-
-
 from pytube import YouTube
 import sys
 
