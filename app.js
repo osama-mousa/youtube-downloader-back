@@ -3,6 +3,7 @@ const app = express();
 const cors = require('cors');
 const { exec } = require('child_process');
 const path = require('path');
+const fs = require('fs');
 
 
 app.use(cors());
@@ -18,45 +19,33 @@ app.listen(3000,()=>{
 })
 
 
-app.get('/', (req, res) => {
-  res.status(200).send('hello world')
-})
-
 const links = []
-
-app.post('/api/download', (req, res) => {
-  const body = req.body
-  links.push(body)
-  console.log(body)
-  res.status(201).json({body}).send('Done!')
-})
-
-app.get('/api/download',(req,res)=>{
-  res.json({
-    links
-  })
-})
-
-
-
 
 app.post('/api/downloadVideo', async (req, res) => {
   const link = req.body.link;
-
+  links.push(link)
   try {
     const filePath = await downloadVideo(link);
-    console.log(`Video downloaded successfully: ${filePath}`);
-    // res.send(`Video downloaded successfully: ${filePath}`);
-    // res.sendFile(filePath);
-
+    const filename = path.basename(filePath);
     const absolutePath = path.resolve(filePath);
+    console.log(`Video downloaded successfully: ${filename}`);
+
     // إرسال الملف كاستجابة
+    // res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     res.setHeader('Content-Type', 'video/mp4');
-    res.sendFile(absolutePath);
+    res.download(absolutePath, filename, (err) => {
+      if (err) {
+        console.error(`Error sending file: ${err}`);
+        res.status(500).send('Internal Server Error');
+      } else {
+        console.log('File sent successfully');
+        fs.unlinkSync(absolutePath);
+      }
+    });
     
   } catch (error) {
     console.error(`Error downloading video: ${error}`);
-    res.status(500).send('Internal Server Error');
+    res.status(404).send('The download link not found.');
   }
 });
 
