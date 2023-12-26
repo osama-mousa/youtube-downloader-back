@@ -45,7 +45,6 @@ app.post('/api/downloadVideo', async (req, res) => {
   } catch (error) {
     console.error(`Error downloading video: ${error}`);
     res.status(404).send('The download link not found.');
-    fs.unlinkSync(absolutePath);
   }
 });
 
