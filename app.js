@@ -45,12 +45,13 @@ app.post('/api/downloadVideo', async (req, res) => {
   } catch (error) {
     console.error(`Error downloading video: ${error}`);
     res.status(404).send('The download link not found.');
+    fs.unlinkSync(absolutePath);
   }
 });
 
 function downloadVideo(link) {
   return new Promise((resolve, reject) => {
-    const command = `python3 YouTube.py ${link}`;
+    const command = `python YouTube.py ${link}`;
 
     exec(command, (error, stdout, stderr) => {
       if (error) {
