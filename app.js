@@ -19,15 +19,11 @@ app.listen(3000,()=>{
 })
 
 
-// const links = []
-
-app.get('/api/',async (req,res)=>{
-  res.send('Hello world')
-})
+const links = []
 
 app.post('/api/downloadVideo', async (req, res) => {
-  // const link = req.body.link;
-  // links.push(link)
+  const link = req.body.link;
+  links.push(link)
   try {
     const filePath = await downloadVideo(link);
     const filename = path.basename(filePath);
