@@ -19,11 +19,15 @@ app.listen(3000,()=>{
 })
 
 
-const links = []
+// const links = []
+
+app.get('/api/',async (req,res)=>{
+  res.send('Hello world')
+})
 
 app.post('/api/downloadVideo', async (req, res) => {
-  const link = req.body.link;
-  links.push(link)
+  // const link = req.body.link;
+  // links.push(link)
   try {
     const filePath = await downloadVideo(link);
     const filename = path.basename(filePath);
@@ -31,7 +35,6 @@ app.post('/api/downloadVideo', async (req, res) => {
     console.log(`Video downloaded successfully: ${filename}`);
 
     // إرسال الملف كاستجابة
-    // res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     res.setHeader('Content-Type', 'video/mp4');
     res.download(absolutePath, filename, (err) => {
       if (err) {
