@@ -1,7 +1,8 @@
 import os
-pytube = os.environ.get('/opt/render/.local/lib/python3.7/site-packages')
+os.environ.get('/opt/render/.local/lib/python3.7/site-packages')
 from pytube import YouTube
 import sys
+# sys.path.append('/opt/render/.local/lib/python3.7/site-packages')
 
 link = sys.argv[1]
 
