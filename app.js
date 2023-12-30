@@ -6,6 +6,9 @@ const path = require('path');
 const fs = require('fs');
 const ytdl = require('ytdl-core');
 
+// Disable update check for ytdl-core
+process.env.YTDL_NO_UPDATE = true;
+
 app.use(cors());
 app.use((req, res, next) => {
   res.header('Content-Type', 'application/json');
