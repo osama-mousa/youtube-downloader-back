@@ -4,7 +4,7 @@ const cors = require('cors');
 const { exec } = require('child_process');
 const path = require('path');
 const fs = require('fs');
-
+const ytdl = require('ytdl-core');
 
 app.use(cors());
 app.use((req, res, next) => {
@@ -14,104 +14,50 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.listen(3000,()=>{
-  console.log('I am Listening in port 3000')
-})
+app.listen(3000, () => {
+  console.log('I am Listening in port 3000');
+});
 
-
-const links = []
+const links = [];
 
 app.post('/api/downloadVideo', async (req, res) => {
   const link = req.body.link;
-  links.push(link)
+  links.push(link);
   try {
-    const filePath = await downloadVideo(link);
-    const filename = path.basename(filePath);
-    const absolutePath = path.resolve(filePath);
-    console.log(`Video downloaded successfully: ${filename}`);
+    const videoInfo = await ytdl.getInfo(link);
+    const format = ytdl.chooseFormat(videoInfo.formats, { quality: 'highest' });
 
-    // إرسال الملف كاستجابة
-    res.setHeader('Content-Type', 'video/mp4');
-    res.download(absolutePath, filename, (err) => {
-      if (err) {
-        console.error(`Error sending file: ${err}`);
-        res.status(500).send('Internal Server Error');
-      } else {
-        console.log('File sent successfully');
-        fs.unlinkSync(absolutePath);
-      }
+    if (!format) {
+      console.error('No suitable format found');
+      res.status(500).send('Internal Server Error');
+      return;
+    }
+
+    const videoStream = ytdl(link, { quality: 'highest' });
+
+    const filename = `${videoInfo.title}.mp4`;
+    const filePath = path.join(__dirname, filename);
+    const file = fs.createWriteStream(filePath);
+
+    videoStream.pipe(file);
+
+    file.on('finish', () => {
+      console.log(`Video downloaded successfully: ${filename}`);
+
+      res.setHeader('Content-Type', 'video/mp4');
+      res.sendFile(filePath, filename, (err) => {
+        if (err) {
+          console.error(`Error sending file: ${err}`);
+          res.status(500).send('Internal Server Error');
+        } else {
+          console.log('File sent successfully');
+          fs.unlinkSync(filePath);
+        }
+      });
     });
-    
+
   } catch (error) {
-    console.error(`Error downloading video: ${error}`);
+    console.error(`Error downloading video: ${error.message}`);
     res.status(404).send('The download link not found.');
   }
 });
-
-function downloadVideo(link) {
-  return new Promise((resolve, reject) => {
-    const command = `python YouTube.py ${link}`;
-
-    exec(command, (error, stdout, stderr) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(stdout.trim());
-      }
-    });
-  });
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// var createError = require('http-errors');
-// var path = require('path');
-// var cookieParser = require('cookie-parser');
-// var logger = require('morgan');
-// var indexRouter = require('./routes/index');
-// var usersRouter = require('./routes/users');
-
-// // view engine setup
-// app.set('views', path.join(__dirname, 'views'));
-// app.set('view engine', 'jade');
-
-// app.use(logger('dev'));
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: false }));
-// app.use(cookieParser());
-// app.use(express.static(path.join(__dirname, 'public')));
-
-// app.use('/', indexRouter);
-// app.use('/users', usersRouter);
-
-// // catch 404 and forward to error handler
-// app.use(function(req, res, next) {
-//   next(createError(404));
-// });
-
-// // error handler
-// app.use(function(err, req, res, next) {
-//   // set locals, only providing error in development
-//   res.locals.message = err.message;
-//   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-//   // render the error page
-//   res.status(err.status || 500);
-//   res.render('error');
-// });
-
-// module.exports = app;
