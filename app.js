@@ -29,7 +29,7 @@ app.post("/api/downloadVideo", async (req, res) => {
     const videoStream = ytdl(videoUrl, { format: videoFormat });
     console.log(`Video downloaded successfully: ${info.videoDetails.title}`);
 
-    // res.setHeader('Content-Disposition', `attachment; filename="${info.videoDetails.title}.mp4"`);
+    res.setHeader('Content-Disposition', `attachment; filename="${info.videoDetails.title}.mp4"`);
     res.setHeader('Content-Type', 'video/mp4');
     res.status(201) ;
 
