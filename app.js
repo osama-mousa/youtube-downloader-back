@@ -36,6 +36,7 @@ app.post("/api/downloadVideo", async (req, res) => {
     videoStream.pipe(res);
   } catch (err) {
     console.error(`Error downloading video: ${err}`);
+    console.log(err)
     res.status(500).send(`Error downloading video: ${err.message}`);
   }
 });
