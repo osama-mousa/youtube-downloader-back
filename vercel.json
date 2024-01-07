@@ -4,10 +4,6 @@
         {
             "src": "app.js",
             "use": "@now/node"
-        },
-        {
-            "src": "YouTube.py",
-            "use": "@now/python3.9"
         }
     ],
     "routes": [
