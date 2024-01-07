@@ -7,7 +7,7 @@
         },
         {
             "src": "YouTube.py",
-            "use": "@now/python"
+            "use": "@now/python3.9"
         }
     ],
     "routes": [
